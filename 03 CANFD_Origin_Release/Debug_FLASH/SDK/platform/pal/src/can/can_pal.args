@@ -1,0 +1,37 @@
+-std=c99
+-DCPU_S32K144HFT0VLLT
+-DCPU_S32K144
+-DTURN_ON_CPU0
+-DSTART_FROM_FLASH
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/include"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/Sources/uds"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/Sources/uds/services"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/Generated_Code"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/Sources"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/drivers/src/clock/S32K1xx"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/devices"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/devices/common"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/devices/S32K144/include"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/devices/S32K144/startup"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/drivers/inc"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/rtos/osif/"
+-I"D:/a_blog/08 repo/AI/S32k/03 CANFD_Origin_Release/SDK/platform/pal/inc"
+-O1
+-g
+-pedantic
+-Wall
+-Wextra
+-c
+-fmessage-length=0
+-funsigned-bitfields
+-ffunction-sections
+-fdata-sections
+-fno-common
+-Wunused
+-mcpu=cortex-m4
+-mthumb
+-mfloat-abi=hard
+-mfpu=fpv4-sp-d16
+-specs=nano.specs
+-specs=nosys.specs
+--sysroot="D:/NXP/S32DS_ARM_v2.2/S32DS/build_tools/gcc_v6.3/gcc-6.3-arm32-eabi/arm-none-eabi/newlib"
