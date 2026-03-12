@@ -1,6 +1,8 @@
 # UDS (Unified Diagnostic Services) Protocol Stack
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+🌐 **中文** | [English](README_EN.md)
 [![Platform](https://img.shields.io/badge/platform-ARM%20Cortex%20M4-orange.svg)]()
 [![Standard](https://img.shields.io/badge/standard-ISO%2014229--1%20%7C%20ISO%2015765--2-green.svg)]()
 
