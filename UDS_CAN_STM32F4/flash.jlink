@@ -1,0 +1,10 @@
+device STM32F407VG
+si 1
+speed 4000
+connect
+r
+h
+loadbin build/uds_can_stm32f4.bin, 0x08000000
+r
+g
+exit
