@@ -2,13 +2,13 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-🌐 **中文** | [English](README.md)
+**中文** | [English](README.md)
 [![Platform](https://img.shields.io/badge/platform-ARM%20Cortex%20M4-orange.svg)]()
 [![Standard](https://img.shields.io/badge/standard-ISO%2014229--1%20%7C%20ISO%2015765--2-green.svg)]()
 
 一个轻量级、可移植的 **UDS 诊断协议栈**实现，基于 ISO 14229-1 和 ISO 15765-2 标准，支持经典 CAN 和 CAN FD。
 
-## 📁 项目结构
+## 项目结构
 
 ```
 publilc_code/
@@ -26,8 +26,10 @@ publilc_code/
 │   │       ├── uds_nrc.c/.h          # 否定响应处理
 │   │       ├── services/             # UDS 服务实现
 │   │       │   ├── uds_svc_10.c/.h   # 诊断会话控制 (0x10)
+    │   │       │   ├── uds_svc_19.c/.h   # 读取故障码信息 (0x19)
 │   │       │   ├── uds_svc_22.c/.h   # 通过ID读取数据 (0x22)
 │   │       │   ├── uds_svc_27.c/.h   # 安全访问 (0x27)
+    │   │       │   ├── uds_svc_2e.c/.h   # 通过ID写入数据 (0x2E)
 │   │       │   └── uds_svc_31.c/.h   # 例程控制 (0x31)
 │   │       └── UDS_Design_Spec.md    # 详细设计规格书
 │   └── SDK/                          # NXP S32K SDK
@@ -45,38 +47,40 @@ publilc_code/
     └── Project/                      # Keil 工程文件
 ```
 
-## ✨ 核心特性
+## 核心特性
 
-### 🔧 协议支持
+### 协议支持
 - **ISO 14229-1 (UDS)** - 统一的诊断服务标准
 - **ISO 15765-2 (CAN TP)** - CAN 传输层协议
 - **经典 CAN** (8 字节数据帧)
 - **CAN FD** (64 字节数据帧)
 - **多帧传输** (最大 4095 字节)
 
-### 🚀 已实现的服务 (SID)
+### 已实现的服务 (SID)
 | SID | 服务名称 | 说明 |
 |-----|----------|------|
 | 0x10 | Diagnostic Session Control | 诊断会话控制（默认/扩展/编程会话） |
+| 0x19 | Read DTC Information | 读取故障码信息（0x02/0x0A/0x06） |
 | 0x22 | Read Data By Identifier | 通过 ID 读取数据 |
 | 0x27 | Security Access | 安全访问（种子/密钥机制） |
+| 0x2E | Write Data By Identifier | 通过 ID 写入数据（DTC故障注入） |
 | 0x31 | Routine Control | 例程控制（启动/停止/请求结果） |
 | 0x3E | Tester Present | 测试仪在线保持 |
 
-### 🛡️ 安全特性
+### 安全特性
 - 基于位图的**会话权限控制**
 - **安全访问等级**管理（支持多级解锁）
 - 种子-密钥算法（用户可自定义）
 - 尝试次数限制和延时锁定机制
 
-### ⚡ 高级功能
+### 高级功能
 - **物理寻址**和**功能寻址**支持
 - **抑制肯定响应 (SPR)** 位处理
 - **0x78 ResponsePending** 机制
 - **配置表驱动**架构（易于扩展新服务）
 - 完整的 **NRC (否定响应码)** 支持
 
-## 🏗️ 架构设计
+## 架构设计
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -113,7 +117,7 @@ publilc_code/
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 快速开始
+## 快速开始
 
 ### 1. 克隆仓库
 ```bash
@@ -183,7 +187,7 @@ int main(void)
 }
 ```
 
-## ⚙️ 配置说明
+## 配置说明
 
 ### CAN ID 配置
 | 类型 | ID (Hex) | 说明 |
@@ -205,29 +209,29 @@ int main(void)
 #define UDS_S3_SERVER_TIMEOUT    5000u    /* 会话超时 (ms) */
 ```
 
-## 📚 文档
+## 文档
 
 - [UDS 设计规格书](03%20CANFD_Origin_Release/Sources/uds/UDS_Design_Spec.md) - 详细的架构设计和 API 文档
 
-## 🛠️ 开发环境
+## 开发环境
 
 | 平台 | IDE | 编译器 |
 |------|-----|--------|
 | S32K144 | NXP S32 Design Studio | GCC ARM Embedded |
 | STM32F4 | Keil MDK-ARM | ARM Compiler 5/6 |
 
-## 🤝 贡献
+## 贡献
 
 欢迎提交 Issue 和 Pull Request！
 
-## 📝 许可证
+## 许可证
 
 本项目基于 [MIT](LICENSE) 许可证开源。
 
-## 👨‍💻 作者
+## 作者
 
 - **小昭debug** - [xiaozhaodebug](https://github.com/xiaozhaodebug)
 
 ---
 
-> 💡 **提示**: 这是一个教育性质的 UDS 协议栈实现，适合学习 UDS 协议原理和嵌入式诊断开发。
+> **提示**: 这是一个教育性质的 UDS 协议栈实现，适合学习 UDS 协议原理和嵌入式诊断开发。

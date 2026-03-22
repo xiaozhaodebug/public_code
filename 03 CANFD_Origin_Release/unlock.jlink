@@ -1,0 +1,15 @@
+device S32K144
+si swd
+speed 2000
+connect
+
+// Check status
+exec ReadAP 0
+exec ReadAP 1
+exec ReadAP 2
+
+// Try to unlock
+unlock S32K144
+
+// Exit
+qc

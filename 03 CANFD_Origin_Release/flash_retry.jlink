@@ -1,0 +1,29 @@
+device S32K144
+si swd
+speed 1000
+connect
+
+// 设置更小的 RAM 工作区域 (使用 SRAM_U 部分)
+exec SetWorkRAM 0x20000000 0x20006FFF
+
+// 禁用自动复位
+exec SetResetType = 0
+
+// Halt
+h
+
+// 擦除整个芯片
+erase
+
+// 使用 loadfile 加载 hex (不自动复位)
+loadfile build/S32K144_CANFD_UDS.hex 0x00000000
+
+// 验证
+verifyfile build/S32K144_CANFD_UDS.hex 0x00000000
+
+// 复位并运行
+r
+g
+
+// 退出
+qc

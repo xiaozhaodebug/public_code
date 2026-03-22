@@ -711,11 +711,15 @@ Sources/uds/
 ├── uds_session.h/.c          # 会话管理
 ├── uds_security.h/.c         # 安全访问管理（含算法函数指针）
 ├── uds_routine.h/.c          # 例程控制管理（RID配置表）
+├── uds_dtc.h/.c              # DTC管理模块（DTC存储、状态管理）
 ├── uds_pending.h/.c          # 0x78 ResponsePending处理
 ├── uds_nrc.h/.c              # 否定响应处理
 └── services/
     ├── uds_svc_10.h/.c       # 诊断会话控制（完整实现）
+    ├── uds_svc_19.h/.c       # 读取DTC信息（0x02/0x06/0x0A子服务）
+    ├── uds_svc_22.h/.c       # 根据标识符读取数据
     ├── uds_svc_27.h/.c       # 安全访问（框架+0x2701，函数指针）
+    ├── uds_svc_2e.h/.c       # 根据标识符写入数据（DTC故障注入）
     └── uds_svc_31.h/.c       # 例程控制（RID配置表驱动）
 ```
 
@@ -781,6 +785,9 @@ void UdsStackInit(void)
     UdsRoutineConfigInit(gUdsRoutineTable, 
         sizeof(gUdsRoutineTable)/sizeof(gUdsRoutineTable[0]));
     
+    /* 初始化DTC管理模块 */
+    UdsDtcInit();
+    
     /* 初始化UDS核心 */
     UdsInit(gUdsServiceTable, 
         sizeof(gUdsServiceTable)/sizeof(gUdsServiceTable[0]));
@@ -818,6 +825,128 @@ void LPIT_ISR(void)
 
 ---
 
-**文档版本**: v2.0  
-**日期**: 2026-03-08  
-**状态**: 待Review
+## 14. 0x19 读取DTC信息服务
+
+### 14.1 功能概述
+0x19服务用于读取诊断故障码(DTC)信息，支持以下子服务：
+- 0x02: 按状态掩码报告DTC列表
+- 0x06: 报告DTC扩展数据记录
+- 0x0A: 报告支持的DTC
+
+### 14.2 DTC数据结构
+```c
+typedef struct {
+    uint32_t dtcCode;               /* DTC代码 (3字节) */
+    uint8_t  status;                /* DTC状态字节 */
+    uint8_t  severity;              /* 严重程度 */
+    bool     isValid;               /* 条目有效标志 */
+    uint32_t firstDetectTime;       /* 首次检测时间 */
+    uint32_t lastDetectTime;        /* 最后检测时间 */
+    UdsDtcExtData extData;          /* 扩展数据记录 */
+} UdsDtcEntry;
+```
+
+### 14.3 DTC状态位定义
+| 位 | 名称 | 说明 |
+|----|------|------|
+| bit0 | Test Failed | 测试失败 |
+| bit1 | Test Failed This Op Cycle | 本操作循环测试失败 |
+| bit2 | Pending DTC | 等待确认 |
+| bit3 | Confirmed DTC | 已确认 |
+| bit4 | Test Not Completed Since Clear | 清除后测试未完成 |
+| bit5 | Test Failed Since Clear | 清除后测试失败过 |
+| bit6 | Test Not Completed This Op Cycle | 本循环测试未完成 |
+| bit7 | Warning Indicator | 警告指示器请求 |
+
+### 14.4 服务请求/响应格式
+
+**0x19 02 - 按状态掩码读取DTC:**
+```
+请求:  19 02 [StatusMask]
+响应:  59 02 [DTCFormat] [DTCCount] [DTC1]...[Status1]...
+示例:  请求: 19 02 FF       (读取所有状态DTC)
+       响应: 59 02 01 01 B0 B0 C0 09  (1个DTC: 0xB0B0C0, 状态=0x09)
+```
+
+**0x19 0A - 读取支持的DTC:**
+```
+请求:  19 0A
+响应:  59 0A [DTCFormat] [AvailabilityMask] [DTC1]...[Status1]...
+```
+
+**0x19 06 - 读取DTC扩展数据:**
+```
+请求:  19 06 [DTC_H] [DTC_M] [DTC_L] [ExtDataRecordNum]
+响应:  59 06 [DTCFormat] [DTC_H] [DTC_M] [DTC_L] [Status] [ExtData...]
+示例:  请求: 19 06 B0 B0 C0 FF  (读取DTC 0xB0B0C0的所有扩展数据)
+       响应: 59 06 01 B0 B0 C0 09 05 00 00 00 00 00 00 00
+              (发生计数器=5, 老化计数器=0)
+```
+
+### 14.5 DTC扩展数据记录
+| 字节 | 内容 | 说明 |
+|------|------|------|
+| 0 | occurrenceCounter | 故障发生计数器 |
+| 1 | agingCounter | 老化计数器 |
+| 2 | faultDetectionCounter | 故障检测计数器 |
+| 3-7 | reserved | 保留 |
+
+---
+
+## 15. 0x2E 写入数据服务 (DTC故障注入)
+
+### 15.1 功能概述
+0x2E服务用于通过写入特定DID来触发或清除DTC故障，主要用于测试目的。
+
+### 15.2 特殊DID定义
+| DID | 名称 | 功能 | 请求数据 |
+|-----|------|------|----------|
+| 0xF1F0 | DTC_TRIGGER | 触发DTC故障 | [Magic] [DTC_H] [DTC_M] [DTC_L] |
+| 0xF1F1 | DTC_CLEAR | 清除指定DTC | [Magic] [DTC_H] [DTC_M] [DTC_L] |
+| 0xF1F2 | DTC_CLEAR_ALL | 清除所有DTC | [Magic] |
+
+### 15.3 数据格式
+
+**触发DTC故障 (2E F1 F0):**
+```
+请求:  2E F1 F0 [Magic] [DTC_H] [DTC_M] [DTC_L]
+       PCI=0x06 (SID + DID + Magic + DTC[3])
+       Magic = 0xA5 (验证字节)
+示例:  请求: 06 2E F1 F0 A5 B0 B0 C0  (触发DTC 0xB0B0C0故障)
+       响应: 03 6E F1 F0
+```
+
+**清除指定DTC (2E F1 F1):**
+```
+请求:  2E F1 F1 [Magic] [DTC_H] [DTC_M] [DTC_L]
+示例:  请求: 06 2E F1 F1 A5 B0 B0 C0  (清除DTC 0xB0B0C0)
+       响应: 03 6E F1 F1
+```
+
+**清除所有DTC (2E F1 F2):**
+```
+请求:  2E F1 F2 [Magic]
+示例:  请求: 03 2E F1 F2 A5  (清除所有DTC)
+       响应: 03 6E F1 F2
+```
+
+### 15.4 Python测试脚本
+使用 `test_uds_19_dtc.py` 脚本进行自动化测试：
+```bash
+# 运行测试
+python3 test_uds_19_dtc.py
+
+# 测试流程:
+# 1. 进入扩展会话 (10 03)
+# 2. 通过 2E F1 F0 注入DTC故障
+# 3. 使用 19 02 读取当前DTC列表
+# 4. 使用 19 0A 读取支持的DTC
+# 5. 使用 19 06 读取DTC扩展数据
+# 6. 可选: 清除DTC并验证
+```
+
+---
+
+**文档版本**: v2.1  
+**日期**: 2026-03-22  
+**状态**: 已实现0x19/0x2E服务

@@ -1,0 +1,10 @@
+device S32K144
+si swd
+speed 2000
+connect
+h
+erase
+loadfile build/S32K144_CANFD_UDS.hex
+r
+g
+qc

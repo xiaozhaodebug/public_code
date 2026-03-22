@@ -4,11 +4,11 @@
 [![Platform](https://img.shields.io/badge/platform-ARM%20Cortex%20M4-orange.svg)]()
 [![Standard](https://img.shields.io/badge/standard-ISO%2014229--1%20%7C%20ISO%2015765--2-green.svg)]()
 
-🌐 **English** | [中文](README_ZH.md)
+**English** | [中文](README_ZH.md)
 
 A lightweight, portable **UDS Diagnostic Protocol Stack** implementation based on ISO 14229-1 and ISO 15765-2 standards, supporting both Classic CAN and CAN FD.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 publilc_code/
@@ -26,8 +26,10 @@ publilc_code/
 │   │       ├── uds_nrc.h/.c          # Negative response handling
 │   │       ├── services/             # UDS service implementations
 │   │       │   ├── uds_svc_10.h/.c   # Diagnostic Session Control (0x10)
+    │   │       │   ├── uds_svc_19.h/.c   # Read DTC Information (0x19)
 │   │       │   ├── uds_svc_22.h/.c   # Read Data By Identifier (0x22)
 │   │       │   ├── uds_svc_27.h/.c   # Security Access (0x27)
+    │   │       │   ├── uds_svc_2e.h/.c   # Write Data By Identifier (0x2E)
 │   │       │   └── uds_svc_31.h/.c   # Routine Control (0x31)
 │   │       └── UDS_Design_Spec.md    # Detailed design specification
 │   └── SDK/                          # NXP S32K SDK
@@ -45,38 +47,40 @@ publilc_code/
     └── Project/                      # Keil project files
 ```
 
-## ✨ Key Features
+## Key Features
 
-### 🔧 Protocol Support
+### Protocol Support
 - **ISO 14229-1 (UDS)** - Unified Diagnostic Services standard
 - **ISO 15765-2 (CAN TP)** - CAN transport layer protocol
 - **Classic CAN** (8-byte data frames)
 - **CAN FD** (64-byte data frames)
 - **Multi-frame transmission** (up to 4095 bytes)
 
-### 🚀 Implemented Services (SID)
+### Implemented Services (SID)
 | SID | Service Name | Description |
 |-----|--------------|-------------|
 | 0x10 | Diagnostic Session Control | Session management (Default/Extended/Programming) |
+| 0x19 | Read DTC Information | Read diagnostic trouble code info (0x02/0x0A/0x06) |
 | 0x22 | Read Data By Identifier | Read data by DID |
 | 0x27 | Security Access | Seed/key security mechanism |
+| 0x2E | Write Data By Identifier | Write data by DID (DTC fault injection) |
 | 0x31 | Routine Control | Start/Stop/Request routine results |
 | 0x3E | Tester Present | Keep diagnostic session alive |
 
-### 🛡️ Security Features
+### Security Features
 - **Bitmap-based session permission control**
 - **Multi-level security access** management
 - Seed-key algorithm (user-customizable)
 - Attempt limit and delay lock mechanism
 
-### ⚡ Advanced Features
+### Advanced Features
 - **Physical** and **Functional** addressing support
 - **Suppress Positive Response (SPR)** bit handling
 - **0x78 ResponsePending** mechanism
 - **Table-driven configuration** architecture (easy to extend)
 - Complete **NRC (Negative Response Code)** support
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -113,7 +117,7 @@ publilc_code/
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone Repository
 ```bash
@@ -183,7 +187,7 @@ int main(void)
 }
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### CAN ID Configuration
 | Type | ID (Hex) | Description |
@@ -205,29 +209,29 @@ int main(void)
 #define UDS_S3_SERVER_TIMEOUT    5000u    /* Session timeout (ms) */
 ```
 
-## 📚 Documentation
+## Documentation
 
 - [UDS Design Specification](03%20CANFD_Origin_Release/Sources/uds/UDS_Design_Spec.md) - Detailed architecture and API documentation (Chinese)
 
-## 🛠️ Development Environment
+## Development Environment
 
 | Platform | IDE | Compiler |
 |----------|-----|----------|
 | S32K144 | NXP S32 Design Studio | GCC ARM Embedded |
 | STM32F4 | Keil MDK-ARM | ARM Compiler 5/6 |
 
-## 🤝 Contributing
+## Contributing
 
 Issues and Pull Requests are welcome!
 
-## 📝 License
+## License
 
 This project is open-sourced under the [MIT](LICENSE) license.
 
-## 👨‍💻 Author
+## Author
 
 - **xiaozhaodebug** - [xiaozhaodebug](https://github.com/xiaozhaodebug)
 
 ---
 
-> 💡 **Note**: This is an educational UDS protocol stack implementation, suitable for learning UDS protocol principles and embedded diagnostic development.
+> **Note**: This is an educational UDS protocol stack implementation, suitable for learning UDS protocol principles and embedded diagnostic development.

@@ -1,0 +1,23 @@
+device S32K144
+si swd
+speed 2000
+connect
+
+// Halt
+h
+
+// Erase chip
+erase
+
+// Program firmware using loadbin
+loadbin build/S32K144_CANFD_UDS.bin 0x00000000
+
+// Verify
+verifybin build/S32K144_CANFD_UDS.bin 0x00000000
+
+// Reset and run
+r
+g
+
+// Exit
+qc

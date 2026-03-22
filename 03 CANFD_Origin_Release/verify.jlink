@@ -1,0 +1,14 @@
+device S32K144
+si swd
+speed 1000
+connect
+h
+
+// 读取并验证前 64 字节
+mem32 0x00000000, 16
+
+// 复位并运行
+r
+g
+
+qc

@@ -1,0 +1,19 @@
+device S32K144
+si swd
+speed 1000
+connect
+
+// Halt
+h
+
+// Read current values at 0x00000000
+mem32 0x00000000, 4
+
+// Try to write a word
+w4 0x00000000, 0x20007000
+
+// Read back
+mem32 0x00000000, 4
+
+// Exit
+qc

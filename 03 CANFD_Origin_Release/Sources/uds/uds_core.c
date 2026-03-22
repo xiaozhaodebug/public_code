@@ -289,8 +289,11 @@ static void UdsServiceDispatch(uint8_t *data, uint16_t length)
     if (subServiceConfig == NULL) {
         /* 尝试使用默认处理函数 */
         if (serviceConfig->defaultHandler != NULL) {
-            /* 使用清理后的子服务ID继续处理 */
-            data[1] = subServiceClean;
+            /* 只有在有子服务表的情况下才修改data[1] */
+            /* 对于没有子服务的服务(如0x2E), data[1]是数据的一部分 */
+            if (serviceConfig->subServiceTable != NULL) {
+                data[1] = subServiceClean;
+            }
             nrc = serviceConfig->defaultHandler(data, length, txData, &txLen);
         } else {
             nrc = UDS_NRC_SUB_FUNCTION_NOT_SUPPORTED;

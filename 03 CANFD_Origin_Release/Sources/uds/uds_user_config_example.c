@@ -11,6 +11,9 @@
 #include <string.h>
 #include "Cpu.h"
 #include "services/uds_svc_22.h"
+#include "services/uds_svc_19.h"
+#include "services/uds_svc_2e.h"
+#include "uds_dtc.h"
 /*=============================================================================
  * 平台层实现
  *===========================================================================*/
@@ -210,8 +213,10 @@ const UdsSubServiceConfig gUdsSvc27SubTable[] = {
  *===========================================================================*/
 const UdsServiceConfig gUdsServiceTable[] = {
     {0x10, NULL,                gUdsSvc10SubTable,  sizeof(gUdsSvc10SubTable) / sizeof(gUdsSvc10SubTable[0])},
+    {0x19, UdsSvc19Handler,     NULL,               0},  /* 0x19读取DTC信息 */
     {0x22, UdsSvc22Handler,     NULL,               0},  /* 0x22根据标识符读取数据 */
     {0x27, NULL,                gUdsSvc27SubTable,  sizeof(gUdsSvc27SubTable) / sizeof(gUdsSvc27SubTable[0])},
+    {0x2E, UdsSvc2eHandler,     NULL,               0},  /* 0x2E根据标识符写入数据（用于DTC故障注入） */
     {0x31, UdsSvc31Handler,     NULL,               0},  /* 0x31使用自定义处理 */
 };
 
@@ -230,6 +235,9 @@ void UdsStackInit(void)
     /* 配置例程控制 */
     UdsRoutineConfigInit(gUdsRoutineTable,
                          sizeof(gUdsRoutineTable) / sizeof(gUdsRoutineTable[0]));
+    
+    /* 初始化DTC管理模块 */
+    UdsDtcInit();
 }
 
 /*=============================================================================
