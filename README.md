@@ -8,6 +8,12 @@
 
 A lightweight, portable **UDS Diagnostic Protocol Stack** implementation based on ISO 14229-1 and ISO 15765-2 standards, supporting both Classic CAN and CAN FD.
 
+<p align="center">
+  <img src="docs/images/qrcode.jpg" alt="WeChat QR Code" width="200"/>
+  <br/>
+  <sub>Follow my WeChat Official Account for more technical content</sub>
+</p>
+
 ## Project Structure
 
 ```
@@ -231,6 +237,12 @@ This project is open-sourced under the [MIT](LICENSE) license.
 ## Author
 
 - **xiaozhaodebug** - [xiaozhaodebug](https://github.com/xiaozhaodebug)
+
+## WeChat Official Account
+
+Follow my WeChat Official Account for more technical content:
+
+![WeChat QR Code](docs/images/qrcode.jpg)
 
 ---
 
